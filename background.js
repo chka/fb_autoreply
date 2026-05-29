@@ -91,10 +91,8 @@ async function generate(p, sender) {
     }
   }
 
-  if (settings.safetyCeiling) {
-    const check = checkDraft(draft);
-    if (!check.ok) return { ok: false, code: 'blocked', error: `blocked: ${check.reason}` };
-  }
+  const check = checkDraft(draft);
+  if (!check.ok) return { ok: false, code: 'blocked', error: `blocked: ${check.reason}` };
 
   return { ok: true, draft };
 }

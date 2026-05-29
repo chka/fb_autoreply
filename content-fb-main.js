@@ -111,7 +111,7 @@ async function onChipClick(article, chip) {
 
 function runGenerate(article, chip, tone, length) {
   const ctx = extractContext(article);
-  const kind = article.matches('[aria-label*="Comment" i] *') ? 'comment' : 'post';
+  const kind = article.closest('[aria-label*="Comment" i]') ? 'comment' : 'post';
 
   const modal = openModal({
     tone, length, platform: PLATFORM,
@@ -180,5 +180,8 @@ if ('navigation' in window) {
   });
 }
 
-scan();
-console.log('AIreply: content-fb loaded');
+getSettings().then(s => {
+  if (!s.enableOnFacebook) { console.log('AIreply: disabled on Facebook via settings'); return; }
+  scan();
+  console.log('AIreply: content-fb loaded');
+});

@@ -46,9 +46,9 @@ describe('prompt builder', () => {
       ],
     });
     expect(p).toMatch(/RESEARCH:/);
-    expect(p).toMatch(/\[1\] A — https:\/\/a/);
+    expect(p).toMatch(/\[1\] A :: https:\/\/a/);
     expect(p).toMatch(/alpha/);
-    expect(p).toMatch(/\[2\] B — https:\/\/b/);
+    expect(p).toMatch(/\[2\] B :: https:\/\/b/);
   });
 
   it('appends (no search results) when Information has empty research', () => {

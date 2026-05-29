@@ -167,5 +167,8 @@ if ('navigation' in window) {
   });
 }
 
-scan();
-console.log('AIreply: content-x loaded');
+getSettings().then(s => {
+  if (!s.enableOnX) { console.log('AIreply: disabled on X via settings'); return; }
+  scan();
+  console.log('AIreply: content-x loaded');
+});
