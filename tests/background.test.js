@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { handleMessage } from '../background.js';
+import { handleMessage, rateLog } from '../background.js';
 import * as ringside from '../lib/ringside.js';
 import * as ddg from '../lib/ddg.js';
 import * as safety from '../lib/safety.js';
@@ -114,5 +114,43 @@ describe('handleMessage', () => {
     });
     expect(out.ok).toBe(false);
     expect(out.code).toBe('unauthorized');
+  });
+});
+
+describe('hourly rate limit', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-05-29T20:00:00Z'));
+    rateLog.fb.length = 0;
+    rateLog.x.length = 0;
+    vi.spyOn(ringside, 'callRingside').mockResolvedValue('ok');
+    vi.spyOn(storage, 'getSettings').mockResolvedValue({
+      fcApiKey: 'k', fcCustomer: '', defaultModel: 'gpt-4o',
+      defaultTone: 'Nice', defaultLength: 'Short',
+      enableInformationSearch: false, enableOnFacebook: true, enableOnX: true,
+      safetyCeiling: false, lastUsed: { fb: null, x: null },
+    });
+  });
+
+  it('blocks after 30 generations in the same hour for the same platform', async () => {
+    const payload = { platform: 'x', kind: 'post', tone: 'Nice', length: 'Short',
+      target: { author: '@a', text: 'hi' }, thread: [], url: 'u' };
+    for (let i = 0; i < 30; i++) {
+      const r = await handleMessage({ type: 'generate', payload });
+      expect(r.ok).toBe(true);
+    }
+    const r = await handleMessage({ type: 'generate', payload });
+    expect(r.ok).toBe(false);
+    expect(r.code).toBe('rate_limited_local');
+  });
+
+  it('resets after an hour', async () => {
+    const payload = { platform: 'x', kind: 'post', tone: 'Nice', length: 'Short',
+      target: { author: '@a', text: 'hi' }, thread: [], url: 'u' };
+    for (let i = 0; i < 30; i++) await handleMessage({ type: 'generate', payload });
+    vi.advanceTimersByTime(60 * 60 * 1000 + 1);
+    const r = await handleMessage({ type: 'generate', payload });
+    expect(r.ok).toBe(true);
   });
 });

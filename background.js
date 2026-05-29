@@ -8,6 +8,19 @@ const MAX_PAYLOAD_BYTES = 8 * 1024;
 
 const inFlight = new Map();
 
+const RATE_LIMIT_PER_HOUR = 30;
+export const rateLog = { fb: [], x: [] };
+
+function checkRateLimit(platform) {
+  const now = Date.now();
+  const cutoff = now - 60 * 60 * 1000;
+  const log = rateLog[platform] || (rateLog[platform] = []);
+  while (log.length && log[0] < cutoff) log.shift();
+  if (log.length >= RATE_LIMIT_PER_HOUR) return false;
+  log.push(now);
+  return true;
+}
+
 function payloadBytes(p) {
   return new Blob([JSON.stringify(p)]).size;
 }
@@ -28,6 +41,10 @@ async function generate(p, sender) {
   }
   if (payloadBytes(p) > MAX_PAYLOAD_BYTES) {
     return { ok: false, error: 'context too large (>8 KB)' };
+  }
+
+  if (!checkRateLimit(p.platform)) {
+    return { ok: false, code: 'rate_limited_local', error: 'local hourly limit (30/hr) reached' };
   }
 
   const settings = await getSettings();
