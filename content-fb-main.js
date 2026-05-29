@@ -9,10 +9,25 @@ const CHIP_CLASS = 'aireply-chip';
 
 const styleEl = document.createElement('style');
 styleEl.textContent = `
-button.${CHIP_CLASS} { all: unset; cursor: pointer; padding: 4px 8px; margin-left: 4px;
-  border-radius: 6px; font: 12px system-ui, sans-serif; color: #5b6678;
-  border: 1px solid #d0d5dd; background: rgba(35,134,247,0.06); }
-button.${CHIP_CLASS}:hover { background: rgba(35,134,247,0.14); color: #1c1e21; }
+button.${CHIP_CLASS} {
+  all: unset; cursor: pointer; display: inline-flex; align-items: center;
+  padding: 5px 12px; margin-left: 6px; border-radius: 9999px;
+  font: 600 12px/1 system-ui, -apple-system, sans-serif; letter-spacing: 0.02em;
+  color: #ffffff;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 55%, #ec4899 100%);
+  box-shadow: 0 1px 2px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.20);
+  transition: transform .12s ease, box-shadow .15s ease, filter .15s ease;
+  vertical-align: middle;
+}
+button.${CHIP_CLASS}:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06) saturate(1.05);
+  box-shadow: 0 4px 12px rgba(168,85,247,.35), inset 0 1px 0 rgba(255,255,255,.25);
+}
+button.${CHIP_CLASS}:active {
+  transform: translateY(0); filter: brightness(.95);
+  box-shadow: 0 1px 2px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.12);
+}
 `;
 document.documentElement.appendChild(styleEl);
 
