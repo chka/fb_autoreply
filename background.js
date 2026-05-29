@@ -32,7 +32,7 @@ async function generate(p, sender) {
 
   const settings = await getSettings();
   if (!settings.fcApiKey) {
-    return { ok: false, code: 'no_key', error: 'API key missing — open options' };
+    return { ok: false, code: 'no_key', error: 'API key missing - open options' };
   }
 
   let research;
