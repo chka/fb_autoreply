@@ -1,0 +1,16 @@
+.aireply-menu { position: absolute; z-index: 2147483647;
+  background: #0e1726; color: #e8eef9; border: 1px solid #2c3a55;
+  border-radius: 8px; padding: 8px; font: 13px system-ui, sans-serif;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5); min-width: 280px; }
+.aireply-menu header { display: flex; justify-content: space-between;
+  align-items: center; padding: 0 4px 6px; font-weight: 600; }
+.aireply-menu header button { background: none; border: 0; color: #8fa3c5;
+  cursor: pointer; font-size: 16px; }
+.aireply-menu table { width: 100%; border-collapse: separate; border-spacing: 2px; }
+.aireply-menu th, .aireply-menu td { padding: 2px; }
+.aireply-menu th { font-weight: 500; color: #8fa3c5; text-align: center; }
+.aireply-menu th.tone { text-align: left; }
+.aireply-menu button.cell { width: 100%; padding: 6px 8px; border-radius: 4px;
+  border: 1px solid #2c3a55; background: #15202d; color: #e8eef9; cursor: pointer; }
+.aireply-menu button.cell:hover { background: #1f2d40; }
+.aireply-menu button.cell.last { border-color: #4a7fbc; }
