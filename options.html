@@ -1,4 +1,65 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>AIreply Settings</title></head>
-<body><h1>AIreply</h1><p>Settings page — see Task 13.</p>
-<script src="options.js" type="module"></script></body></html>
+<html><head><meta charset="utf-8"><title>AIreply Settings</title>
+<style>
+  body { font: 14px system-ui, sans-serif; background: #0e1726; color: #e8eef9;
+    margin: 0; padding: 32px; max-width: 640px; }
+  h1 { font-size: 18px; margin: 0 0 24px; }
+  label { display: block; margin-top: 16px; color: #8fa3c5; font-size: 12px; }
+  input[type=text], input[type=password], select {
+    width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid #2c3a55;
+    background: #15202d; color: #e8eef9; font: inherit; box-sizing: border-box; }
+  input[type=checkbox] { transform: scale(1.2); margin-right: 8px; }
+  .check { display: flex; align-items: center; margin-top: 12px; }
+  .check label { margin: 0; color: #e8eef9; font-size: 14px; }
+  button { margin-top: 20px; padding: 10px 16px; border-radius: 6px; border: 1px solid #2386f7;
+    background: #2386f7; color: #fff; cursor: pointer; font: inherit; }
+  button.secondary { background: #15202d; color: #e8eef9; }
+  .status { margin-top: 12px; color: #8fa3c5; font-size: 12px; min-height: 1em; }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+</style></head>
+<body>
+  <h1>AIreply Settings</h1>
+
+  <label for="fcApiKey">Ringside API key</label>
+  <div class="row">
+    <input id="fcApiKey" type="password" placeholder="sk_live_…" />
+    <button id="testKey" class="secondary" style="margin-top:0; flex:0 0 auto;">Test</button>
+  </div>
+
+  <label for="fcCustomer">Customer tag (optional, sent as <code>FC-Customer</code>)</label>
+  <input id="fcCustomer" type="text" placeholder="cust_42" />
+
+  <label for="defaultModel">Default model</label>
+  <input id="defaultModel" type="text" placeholder="gpt-4o" />
+
+  <div class="row">
+    <div>
+      <label for="defaultTone">Default tone</label>
+      <select id="defaultTone">
+        <option>Polite</option><option>Nice</option><option>Information</option>
+        <option>Bad</option><option>Ugly</option><option>Curse</option>
+      </select>
+    </div>
+    <div>
+      <label for="defaultLength">Default length</label>
+      <select id="defaultLength">
+        <option>Short</option><option>Medium</option><option>Long</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="check"><input id="enableInformationSearch" type="checkbox" />
+    <label for="enableInformationSearch">Use DuckDuckGo search for Information tone</label></div>
+  <div class="check"><input id="enableOnFacebook" type="checkbox" />
+    <label for="enableOnFacebook">Enable on Facebook</label></div>
+  <div class="check"><input id="enableOnX" type="checkbox" />
+    <label for="enableOnX">Enable on X</label></div>
+  <div class="check"><input id="safetyCeiling" type="checkbox" disabled checked />
+    <label for="safetyCeiling">Safety ceiling (locked on in v1)</label></div>
+
+  <button id="save">Save</button>
+  <div class="status" id="status"></div>
+
+  <script src="options.js" type="module"></script>
+</body></html>
