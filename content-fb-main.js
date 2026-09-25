@@ -39,20 +39,24 @@ function isSkippedRoute() {
   return S.skipUrlPrefixes.some(p => location.pathname.startsWith(p));
 }
 
-function isOutermostArticle(article) {
-  let p = article.parentElement;
-  while (p) {
-    if (p.getAttribute?.('role') === 'article') return false;
-    p = p.parentElement;
-  }
-  return true;
+function isComment(container) {
+  return container.getAttribute('role') === 'article';
 }
 
-function findActionRow(article) {
-  const buttons = article.querySelectorAll('div[role="button"]');
-  for (const b of buttons) {
+// A post container also holds its comments (in the post dialog), so only count
+// elements whose nearest post/comment container is this one.
+function owned(container, el) {
+  return el.closest(S.post) === container;
+}
+
+function ownedButtons(container) {
+  return [...container.querySelectorAll('div[role="button"]')].filter(b => owned(container, b));
+}
+
+function findActionRow(container) {
+  for (const b of ownedButtons(container)) {
     const label = b.getAttribute('aria-label') || '';
-    if (/Like|Comment|Reply|Share/i.test(label)) {
+    if (/^(Like|Leave a comment|Comment|Reply)$/i.test(label)) {
       let row = b.parentElement;
       for (let i = 0; i < 4 && row; i++) {
         const siblings = row.querySelectorAll(':scope > div [role="button"]');
@@ -64,32 +68,34 @@ function findActionRow(article) {
   return null;
 }
 
-function findReplyButton(article) {
-  for (const b of article.querySelectorAll('div[role="button"]')) {
-    const label = b.getAttribute('aria-label') || '';
-    if (/Comment|Reply/i.test(label)) return b;
+function findReplyButton(container) {
+  const buttons = ownedButtons(container);
+  if (isComment(container)) {
+    return buttons.find(b => (b.innerText || '').trim() === 'Reply') || null;
   }
-  return null;
+  return buttons.find(b => b.matches(S.replyButton)) || null;
 }
 
-function extractContext(article) {
-  const textCandidates = article.querySelectorAll('div[dir="auto"], span[dir="auto"]');
+function extractContext(container) {
+  const textCandidates = container.querySelectorAll('div[dir="auto"], span[dir="auto"]');
   let text = '';
   for (const el of textCandidates) {
+    if (!owned(container, el)) continue;
     const t = (el.innerText || '').trim();
     if (t.length > text.length) text = t;
     if (text.length > 1000) break;
   }
-  const linkEl = article.querySelector('a[href*="/posts/"], a[href*="/permalink/"], a[href*="/comment_id="]');
+  const linkEl = [...container.querySelectorAll('a[href*="/posts/"], a[href*="/permalink/"], a[href*="comment_id="]')]
+    .find(a => owned(container, a));
   const url = linkEl ? new URL(linkEl.getAttribute('href'), location.origin).href : location.href;
-  const author = (article.querySelector('h2, h3, h4')?.innerText || '').split('\n')[0].trim();
+  const labelAuthor = (container.getAttribute('aria-label') || '').match(/^Comment by (.+?) (?:\d+|an?|a few|just)\b/)?.[1];
+  const author = labelAuthor || (container.querySelector('h2, h3, h4')?.innerText || '').split('\n')[0].trim();
   return { author, text, ts: '', url };
 }
 
 function injectChip(article) {
   if (seen.has(article)) return;
   if (isSkippedRoute()) return;
-  if (!isOutermostArticle(article)) return;
   const row = findActionRow(article);
   if (!row) return;
   if (row.querySelector(`.${CHIP_CLASS}`)) { seen.add(article); return; }
@@ -126,7 +132,7 @@ async function onChipClick(article, chip) {
 
 function runGenerate(article, chip, tone, length) {
   const ctx = extractContext(article);
-  const kind = article.closest('[aria-label*="Comment" i]') ? 'comment' : 'post';
+  const kind = isComment(article) ? 'comment' : 'post';
 
   const modal = openModal({
     tone, length, platform: PLATFORM,
@@ -140,6 +146,7 @@ function runGenerate(article, chip, tone, length) {
           replyButton: replyBtn,
           replyTextboxSelector: S.replyTextbox,
           text: draftText,
+          preferFocused: true,
         });
       } catch (e) {
         console.error('AIreply: composer fill failed', e);
@@ -174,12 +181,15 @@ function scan(root = document) {
   for (const a of root.querySelectorAll(S.post)) injectChip(a);
 }
 
+// Feed posts mount empty and hydrate later, so an added node inside an
+// existing post has to re-check that post's action row.
 const observer = new MutationObserver(muts => {
   for (const m of muts) {
     for (const n of m.addedNodes) {
       if (n.nodeType !== 1) continue;
-      if (n.matches?.(S.post)) injectChip(n);
-      else if (n.querySelectorAll) {
+      const host = n.closest?.(S.post);
+      if (host) injectChip(host);
+      if (n.querySelectorAll) {
         for (const a of n.querySelectorAll(S.post)) injectChip(a);
       }
     }

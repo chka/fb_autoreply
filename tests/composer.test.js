@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fillComposer, waitForSelector } from '../lib/composer.js';
+import { fillComposer, waitForSelector, waitForFocused } from '../lib/composer.js';
 
 describe('waitForSelector', () => {
   beforeEach(() => { document.body.innerHTML = ''; });
@@ -51,5 +51,24 @@ describe('fillComposer', () => {
     document.body.appendChild(editor);
     await fillComposer(editor, 'x');
     expect(document.activeElement).toBe(editor);
+  });
+});
+
+describe('waitForFocused', () => {
+  beforeEach(() => { document.body.innerHTML = ''; });
+
+  it('resolves with the element focused after the call', async () => {
+    const a = document.createElement('div');
+    a.setAttribute('contenteditable', 'true');
+    a.setAttribute('role', 'textbox');
+    a.tabIndex = 0;
+    document.body.appendChild(a);
+    setTimeout(() => a.focus(), 30);
+    const found = await waitForFocused('[role="textbox"]', 500);
+    expect(found).toBe(a);
+  });
+
+  it('resolves null when nothing matching gets focus', async () => {
+    expect(await waitForFocused('[role="textbox"]', 60)).toBeNull();
   });
 });

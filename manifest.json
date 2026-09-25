@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AIreply",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Inline AI reply chip for Facebook and X. Drafts in 6 tones x 3 lengths, you approve before posting.",
   "permissions": ["storage"],
   "host_permissions": [
