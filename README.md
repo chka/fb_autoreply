@@ -1,17 +1,10 @@
 # AIreply
 
-A Chrome extension that puts an AIreply button on posts and comments on Facebook and X. Click it, pick a tone and a length, and you get a draft reply written in the language of the post you're answering. You can edit the draft, regenerate it or throw it away. When you hit Send it goes into the platform's own reply box, and nothing is posted until you submit it there yourself.
+A browser extension for Chrome and Firefox that puts an AIreply button on posts and comments on Facebook and X. Click it, pick a tone and a length, and you get a draft reply written in the language of the post you're answering. You can edit the draft, regenerate it or throw it away. When you hit Send it goes into the platform's own reply box, and nothing is posted until you submit it there yourself.
 
 ## Install
 
-The extension isn't on the Chrome Web Store yet, so load it unpacked:
-
-1. Clone this repo.
-2. Open `chrome://extensions` and switch on Developer mode.
-3. Click "Load unpacked" and pick the repo folder.
-4. Open the extension's options page and paste in your API key.
-
-No build step. The extension runs straight from the source files.
+Load it unpacked in Chrome or as a temporary add-on in Firefox. [INSTALL.md](INSTALL.md) has the steps for both, including the Firefox permission step that's easy to miss.
 
 ## API key
 
